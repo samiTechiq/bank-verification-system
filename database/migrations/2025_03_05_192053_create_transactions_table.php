@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->time('time');
+            $table->string('time');
             $table->string('receipt_number')->nullable();
             $table->string('name')->nullable();
             $table->integer('amount');
