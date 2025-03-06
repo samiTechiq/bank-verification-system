@@ -16,7 +16,7 @@ class TransactionController extends Controller
     {
         return Inertia::render('transactions/index', [
             'reps' => Rep::where('status', 'active')->select('id', 'name')->get(),
-            'transactions' => Transaction::with(['user:id,name', 'rep:id,name'])->paginate(),
+            'transactions' => Transaction::with(['user:id,name', 'rep:id,name'])->latest()->paginate(10),
         ]);
     }
 
