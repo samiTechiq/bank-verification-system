@@ -56,7 +56,7 @@ class TransactionController extends Controller
                     return $query->where('receipt_number', '=', "$receiptNumber");
                 })->when($amount, function ($query) use ($amount) {
                     return $query->where('amount', '=', "$amount");
-                })->get(),
+                })->latest()->paginate(10),
                 'message' => 'Transaction already recorded'
             ]);
         } else {

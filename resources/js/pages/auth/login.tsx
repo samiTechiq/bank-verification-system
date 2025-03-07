@@ -46,6 +46,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Input
                             id="email"
                             type="email"
+                            name="email"
                             required
                             autoFocus
                             tabIndex={1}
@@ -69,6 +70,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <Input
                             id="password"
                             type="password"
+                            name="password"
                             required
                             tabIndex={2}
                             autoComplete="current-password"
@@ -80,7 +82,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" checked={data.remember} onClick={() => setData('remember', !data.remember)} tabIndex={3} />
+                        <Checkbox
+                            id="remember"
+                            name="remember"
+                            checked={data.remember}
+                            onClick={() => setData('remember', !data.remember)}
+                            tabIndex={3}
+                        />
                         <Label htmlFor="remember">Remember me</Label>
                     </div>
 
