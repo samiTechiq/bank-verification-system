@@ -12,56 +12,83 @@ use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $date = $request->filled('date') ? Carbon::parse($request->date)->format('Y-m-d') : null;
+        $time = $this->formatTimeInput($request->time);
+        $receiptNumber = $request->input('receipt_number');
+        $name = $request->input('name');
+        $rep_id = $request->input('rep_id');
+        $amount = $request->input('amount');
+        // dd($date, $time, $receiptNumber, $name, $rep_id, $amount);
+        $transactions = Transaction::when(!empty($date), fn($query) => $query->whereDate('date', $date))
+            ->when(!empty($time), fn($query) => $query->where('time', $time))
+            ->when(!empty($name), fn($query) => $query->where('name', $name))
+            ->when(!empty($receiptNumber), fn($query) => $query->where('receipt_number', $receiptNumber))
+            ->when(!empty($amount), fn($query) => $query->where('amount', $amount))
+            ->when(!empty($rep_id), fn($query) => $query->where('rep_id', $rep_id))
+            ->with(['user:id,name', 'rep:id,name'])
+            ->latest()
+            ->paginate(10);
+
         return Inertia::render('transactions/index', [
             'reps' => Rep::where('status', 'active')->select('id', 'name')->get(),
-            'transactions' => Transaction::with(['user:id,name', 'rep:id,name'])->latest()->paginate(10),
+            'transactions' => $transactions,
         ]);
     }
 
     public function store(TransactionStoreRequest $request)
     {
         $data = $request->validated();
-        $date = Carbon::parse($data['date'])->format('Y-m-d');
-        $time = $this->formatTimeInput($data['time']);
-        $name = $data['name'];
-        $receiptNumber = $data['receipt_number'];
-        $amount = $data['amount'];
+        $date = !empty($data['date']) ? Carbon::parse($data['date'])->format('Y-m-d') : null;
+        $time = !empty($data['time']) ? $this->formatTimeInput($data['time']) : null;
+        $name = $data['name'] ?? null;
+        $receiptNumber = $data['receipt_number'] ?? null;
+        $amount = $data['amount'] ?? null;
+
         $data['date'] = $date;
         $data['time'] = $time;
 
-        $transaction = Transaction::when($date, function ($query) use ($date) {
-            return $query->whereDate('date', '=', "$date");
-        })->when($time, function ($query) use ($time) {
-            return $query->where('time', '=', "$time");
-        })->when($name, function ($query) use ($name) {
-            return $query->where('name', '=', "$name");
-        })->when($receiptNumber, function ($query) use ($receiptNumber) {
-            return $query->where('receipt_number', '=', "$receiptNumber");
-        })->when($amount, function ($query) use ($amount) {
-            return $query->where('amount', '=', "$amount");
+        $transaction = Transaction::when(!empty($date), function ($query) use ($date) {
+            return $query->whereDate('date', $date);
+        })->when(!empty($time), function ($query) use ($time) {
+            return $query->where('time', $time);
+        })->when(!empty($name), function ($query) use ($name) {
+            return $query->where('name', $name);
+        })->when(!empty($receiptNumber), function ($query) use ($receiptNumber) {
+            return $query->where('receipt_number', $receiptNumber);
+        })->when(!empty($amount), function ($query) use ($amount) {
+            return $query->where('amount', $amount);
         })->get();
 
         if ($transaction->count() > 0) {
             return Inertia::render('transactions/index', [
                 'reps' => Rep::where('status', 'active')->select('id', 'name')->get(),
-                'transactions' => Transaction::with(['user:id,name', 'rep:id,name'])->when($date, function ($query) use ($date) {
-                    return $query->whereDate('date', '=', "$date");
-                })->when($time, function ($query) use ($time) {
-                    return $query->where('time', '=', "$time");
-                })->when($name, function ($query) use ($name) {
-                    return $query->where('name', '=', "$name");
-                })->when($receiptNumber, function ($query) use ($receiptNumber) {
-                    return $query->where('receipt_number', '=', "$receiptNumber");
-                })->when($amount, function ($query) use ($amount) {
-                    return $query->where('amount', '=', "$amount");
-                })->latest()->paginate(10),
-                'message' => 'Transaction already recorded'
+                'transactions' => Transaction::with(['user:id,name', 'rep:id,name'])
+                    ->when(!empty($date), function ($query) use ($date) {
+                        return $query->whereDate('date', $date);
+                    })
+                    ->when(!empty($time), function ($query) use ($time) {
+                        return $query->where('time', $time);
+                    })
+                    ->when(!empty($name), function ($query) use ($name) {
+                        return $query->where('name', $name);
+                    })
+                    ->when(!empty($receiptNumber), function ($query) use ($receiptNumber) {
+                        return $query->where('receipt_number', $receiptNumber);
+                    })
+                    ->when(!empty($amount), function ($query) use ($amount) {
+                        return $query->where('amount', $amount);
+                    })
+                    ->latest()
+                    ->paginate(10),
+                'message' => 'Transaction already recorded',
             ]);
         } else {
             $request->user()->transactions()->create($data);
-            return redirect()->back()->with('success', 'saved successfully');
+
+            return redirect()->route('transactions.index')
+                ->with(['success' => 'Transaction saved successfully']);
         }
     }
 
@@ -75,7 +102,7 @@ class TransactionController extends Controller
         $data['time'] = $time;
 
         $transaction->update($data);
-        return redirect()->back()->with('success', 'Updated successfully');
+        return redirect()->route('transactions.index')->with('success', 'Updated successfully');
     }
 
     /**
