@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Links } from '@/types';
 import { Link } from '@inertiajs/react';
+import { useMemo } from 'react';
 
 interface Props {
     links: Links[];
@@ -9,6 +10,23 @@ interface Props {
 export default function Paginate({ links }: Props) {
     // Filter out empty labels (sometimes provided by Laravel pagination)
     const filteredLinks = links.filter((link) => link.label !== '');
+
+    // Get current URL and query parameters
+    const currentQuery = useMemo(() => {
+        // Get the current URL's query string
+        const url = new URL(window.location.href);
+        const searchParams = url.searchParams;
+
+        // Create a new URLSearchParams object without the 'page' parameter
+        const params = new URLSearchParams();
+        searchParams.forEach((value, key) => {
+            if (key !== 'page') {
+                params.append(key, value);
+            }
+        });
+
+        return params.toString();
+    }, []);
 
     // Helper function to clean HTML entities from labels
     const cleanLabel = (label: string) => {
@@ -21,13 +39,32 @@ export default function Paginate({ links }: Props) {
         return withoutEntities === '←' ? '←' : withoutEntities === '→' ? '→' : withoutEntities;
     };
 
+    // Helper function to merge query parameters
+    const mergeQueryWithUrl = (url: string | null) => {
+        if (!url) return '';
+
+        const newUrl = new URL(url, window.location.origin);
+        const currentQueryString = currentQuery;
+
+        if (currentQueryString) {
+            // If there's a query string already in the URL
+            if (newUrl.search) {
+                return `${newUrl.pathname}${newUrl.search}&${currentQueryString}`;
+            }
+            // If there's no query string yet
+            return `${newUrl.pathname}?${currentQueryString}`;
+        }
+
+        return url;
+    };
+
     return (
         <nav className="flex items-center justify-between px-2 py-3">
             {/* Mobile Previous/Next only */}
             <div className="flex flex-1 justify-between md:hidden">
                 {filteredLinks.find((link) => link.label.includes('Previous')) ? (
                     <Link
-                        href={filteredLinks[0]?.url ?? ''}
+                        href={mergeQueryWithUrl(filteredLinks[0]?.url ?? '')}
                         className={cn(
                             'relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium',
                             !filteredLinks[0]?.url ? 'pointer-events-none bg-gray-100 text-gray-400' : 'bg-white text-gray-700 hover:bg-gray-50',
@@ -43,7 +80,7 @@ export default function Paginate({ links }: Props) {
 
                 {filteredLinks.find((link) => link.label.includes('Next')) ? (
                     <Link
-                        href={filteredLinks[filteredLinks.length - 1]?.url ?? ''}
+                        href={mergeQueryWithUrl(filteredLinks[filteredLinks.length - 1]?.url ?? '')}
                         className={cn(
                             'relative ml-3 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium',
                             !filteredLinks[filteredLinks.length - 1]?.url
@@ -66,7 +103,7 @@ export default function Paginate({ links }: Props) {
                     {filteredLinks.map((link, index) => (
                         <Link
                             key={index}
-                            href={link?.url ?? ''}
+                            href={mergeQueryWithUrl(link?.url ?? '')}
                             className={cn(
                                 'relative inline-flex min-w-[2.5rem] items-center justify-center rounded-md border px-3 py-2 text-sm font-medium',
                                 !link.url
