@@ -32,7 +32,7 @@ class TransactionController extends Controller
             ->paginate(10);
 
         return Inertia::render('transactions/index', [
-            'reps' => Rep::where('status', 'active')->select('id', 'name')->get(),
+            'reps' => Rep::where('status', 'active')->select('id', 'name')->orderby('name', 'asc')->get(),
             'transactions' => $transactions,
         ]);
     }

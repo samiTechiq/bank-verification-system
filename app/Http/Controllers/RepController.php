@@ -13,7 +13,7 @@ class RepController extends Controller
     public function index(): Response
     {
         return Inertia::render('rep/index', [
-            'reps' => Rep::with('user:id,name')->get()
+            'reps' => Rep::with('user:id,name')->orderby('name', 'asc')->get()
         ]);
     }
 
