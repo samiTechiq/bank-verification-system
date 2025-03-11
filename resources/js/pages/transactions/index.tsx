@@ -29,7 +29,7 @@ const Index = ({ reps, transactions, message }: Props) => {
                 <div className="flex items-center gap-x-2">
                     <CreateDialog reps={reps} />
                     <SearchDialog reps={reps} />
-                    <Link className="rounded bg-amber-700 px-6 py-2 text-sm text-white" href={route('transactions.index')}>
+                    <Link className="rounded-lg bg-amber-700 px-6 py-2 text-sm text-white" href={route('transactions.index')}>
                         Reset
                     </Link>
                 </div>

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Rep } from '@/types';
 import { PageProps } from '@/types/inertia';
 import { useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -17,8 +17,14 @@ const CreateTransactionDialog = ({ reps }: Props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [selectedRepName, setSelectedRepName] = useState<string>('');
 
+    // Format current date as YYYY-MM-DD for the date input
+    const getCurrentDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
     const { post, reset, setData, data, processing } = useForm({
-        date: '',
+        date: getCurrentDate(), // Set default date to current date
         time: '',
         receipt_number: '',
         name: '',
@@ -40,6 +46,13 @@ const CreateTransactionDialog = ({ reps }: Props) => {
         });
     };
 
+    // Reset form with default date when dialog opens
+    useEffect(() => {
+        if (open) {
+            setData('date', getCurrentDate());
+        }
+    }, [open]);
+
     return (
         <>
             <div className="flex">
@@ -56,11 +69,18 @@ const CreateTransactionDialog = ({ reps }: Props) => {
                     <form onSubmit={handleSubmit}>
                         <div className="mb-1 space-y-1">
                             <Label htmlFor="date">Date</Label>
-                            <Input name="date" type="date" id="date" onChange={(e) => setData('date', e.target.value)} />
+                            <Input name="date" type="date" id="date" value={data.date} onChange={(e) => setData('date', e.target.value)} />
                         </div>
                         <div className="mb-1 space-y-1">
                             <Label htmlFor="time">Time</Label>
-                            <Input type="text" name="time" id="time" onChange={(e) => setData('time', e.target.value)} placeholder="00:00 am" />
+                            <Input
+                                type="text"
+                                name="time"
+                                id="time"
+                                value={data.time}
+                                onChange={(e) => setData('time', e.target.value)}
+                                placeholder="00:00 am"
+                            />
                         </div>
                         <div className="mb-1 space-y-1">
                             <Label htmlFor="receipt_number">Receipt Number</Label>
@@ -68,13 +88,21 @@ const CreateTransactionDialog = ({ reps }: Props) => {
                                 type="text"
                                 name="receipt_number"
                                 id="receipt_number"
+                                value={data.receipt_number}
                                 onChange={(e) => setData('receipt_number', e.target.value)}
                                 placeholder="Receipt number"
                             />
                         </div>
                         <div className="mb-1 space-y-1">
                             <Label htmlFor="name">Name</Label>
-                            <Input type="text" name="name" id="name" onChange={(e) => setData('name', e.target.value)} placeholder="Customer name" />
+                            <Input
+                                type="text"
+                                name="name"
+                                id="name"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                placeholder="Customer name"
+                            />
                         </div>
                         <div className="mb-1 space-y-1">
                             <Label htmlFor="amount">Amount</Label>
@@ -82,8 +110,9 @@ const CreateTransactionDialog = ({ reps }: Props) => {
                                 type="text"
                                 name="amount"
                                 id="amount"
+                                value={data.amount}
                                 onChange={(e) => setData('amount', e.target.value)}
-                                placeholder="Receipt number"
+                                placeholder="Amount"
                             />
                         </div>
                         <div className="mb-1">
@@ -92,6 +121,7 @@ const CreateTransactionDialog = ({ reps }: Props) => {
                                 name="rep_id"
                                 id="rep_id"
                                 aria-label="Select Rep"
+                                value={data.rep_id}
                                 onChange={(e) => setData('rep_id', e.target.value)}
                                 className="col-span-2 block w-full rounded-lg border border-gray-300 px-2 py-1.5 shadow outline-0"
                             >
