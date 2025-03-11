@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getCurrentDate } from '@/lib/utils';
 import { Rep } from '@/types';
 import { router } from '@inertiajs/react'; // ✅ Use Inertia navigation
 import { Search } from 'lucide-react';
@@ -13,7 +14,7 @@ interface Props {
 
 export function SearchDialog({ reps }: Props) {
     const [open, setOpen] = useState<boolean>(false);
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(getCurrentDate);
     const [time, setTime] = useState('');
     const [receiptNumber, setReceiptNumber] = useState('');
     const [name, setName] = useState('');
@@ -51,7 +52,7 @@ export function SearchDialog({ reps }: Props) {
                     <div className="space-y-1">
                         <div className="space-y-2">
                             <Label htmlFor="date">Date</Label>
-                            <Input id="date" type="date" onChange={(e) => setDate(e.target.value)} />
+                            <Input id="date" defaultValue={date} type="date" onChange={(e) => setDate(e.target.value)} />
                         </div>
 
                         <div className="space-y-2">

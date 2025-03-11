@@ -25,3 +25,9 @@ export function formatDateToIsoString(dateString: string): string {
     // Format to "yyyy-MM-dd"
     return `${year}-${month}-${day}`;
 }
+
+// Format current date as YYYY-MM-DD for the date input
+export const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+};

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getCurrentDate } from '@/lib/utils';
 import { Rep } from '@/types';
 import { PageProps } from '@/types/inertia';
 import { useForm, usePage } from '@inertiajs/react';
@@ -16,12 +17,6 @@ const CreateTransactionDialog = ({ reps }: Props) => {
     const { flash } = usePage<PageProps>().props;
     const [open, setOpen] = useState<boolean>(false);
     const [selectedRepName, setSelectedRepName] = useState<string>('');
-
-    // Format current date as YYYY-MM-DD for the date input
-    const getCurrentDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    };
 
     const { post, reset, setData, data, processing } = useForm({
         date: getCurrentDate(), // Set default date to current date
