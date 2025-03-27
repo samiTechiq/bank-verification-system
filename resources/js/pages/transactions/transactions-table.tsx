@@ -23,6 +23,7 @@ const TransactionsTable = ({ reps, transactions }: Props) => {
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Rep</TableHead>
                                 <TableHead>Created by</TableHead>
+                                <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -37,6 +38,7 @@ const TransactionsTable = ({ reps, transactions }: Props) => {
                                         <TableCell>{transaction.amount}</TableCell>
                                         <TableCell>{transaction.rep.name}</TableCell>
                                         <TableCell>{transaction.user.name}</TableCell>
+                                        <TableCell>{transaction.created_at}</TableCell>
                                         <TableCell className="text-right">
                                             <EditTransactionDialog reps={reps} transaction={transaction} />
                                         </TableCell>

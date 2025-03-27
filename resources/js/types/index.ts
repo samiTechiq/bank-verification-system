@@ -65,6 +65,7 @@ export interface Transaction {
         amount: number;
         rep: Rep;
         user: User;
+        created_at: string;
     }[];
     links: Links[];
 }
@@ -78,6 +79,7 @@ export interface TransactionData {
     amount: number;
     rep: Rep;
     user: User;
+    created_at: string;
 }
 export interface Links {
     url: string | null;

@@ -24,11 +24,11 @@ class Transaction extends Model
         return Carbon::parse($value)->format('d/m/Y'); // Format as needed
     }
 
-    // Accessor for transaction_time
-    // public function getTimeAttribute($value)
-    // {
-    //     return Carbon::parse($value)->format('H:i A'); // Format as needed
-    // }
+    //Accessor for transaction_time
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('d/m/Y H:i A'); // Format as needed
+    }
 
     public function user(): BelongsTo
     {
